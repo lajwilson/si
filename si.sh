@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 # si.sh — Fast, readable, Linux-focused non-root inventory
 # Auto-detects distro family and adapts package/service queries.
+#
+# DISCLAIMER: THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY ARISING FROM THE USE OF THIS SOFTWARE. USE AT YOUR OWN RISK.
+# See LICENSE and README for full terms. MIT License.
+#
 # Usage: curl -fsSL https://raw.githubusercontent.com/lajwilson/si/main/si.sh | bash
 
 set -u
 export LC_ALL=C
 
-# ── Colors (TTY only) ───────────────────────────────────────────────────────
+# ── Colors (TTY only) ──────────────────────────────────────────────────────
 if [[ -t 1 ]]; then
   BOLD=$'\033[1m'; DIM=$'\033[2m'; GREEN=$'\033[0;32m'
   YELLOW=$'\033[0;33m'; CYAN=$'\033[0;36m'; RESET=$'\033[0m'
@@ -117,7 +123,7 @@ echo
 printf "  ${GREEN}Notable mounts:${RESET}\n"
 mount | grep -E '^(nfs|cifs|fuse|/dev)' | head -12 | sed 's/^/    /'
 
-# ── Network ────────────────────────────────────────────────────
+# ── Network ──────────────────────────────────────────────────
 section "Network"
 printf "  ${GREEN}Interfaces:${RESET}\n"
 (ip -brief addr 2>/dev/null || ifconfig -a 2>/dev/null) | head -15 | sed 's/^/    /'
@@ -148,7 +154,7 @@ ps -eo comm,args 2>/dev/null \
   | grep -E 'nginx|apache|httpd|caddy|mysqld|postgres|redis|mongo|docker|containerd|kubelet|java|node|php|gunicorn|uwsgi|celery|prometheus|grafana|node_exporter' \
   | grep -v grep | head -12 | sed 's/^/    /' || warn "None detected"
 
-# ── Users ───────────────────────────────────────────────────────
+# ── Users ─────────────────────────────────────────────────────────
 section "Users"
 printf "  ${GREEN}Local users (uid ≥ 1000 or root):${RESET}\n"
 awk -F: '$3 >= 1000 || $3 == 0 {printf "    %s (uid=%s) shell=%s\n", $1, $3, $7}' /etc/passwd 2>/dev/null
